@@ -628,6 +628,11 @@
           }
           return;
         }
+          // 4. Suara petasan dari iframe
+        if (data.action === 'playFireworkSound') {
+          playFireworkSound();
+          return;
+        }
       } catch(e) {
         console.warn('PostMessage error:', e);
       }
@@ -640,6 +645,97 @@
     // =============================================
     var startTime = Date.now();
     var MIN_LOAD_TIME = 4000;  // 4 detik (lebih cepat dari 6s agar intro animasi portal masih terlihat)
+        // =============================================
+    // FUNGSI SUARA PETASAN (parent context)
+    // Dipanggil via postMessage dari iframe
+    // Parent punya user gesture → audio pasti bunyi
+    // =============================================
+    function playFireworkSound() {
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+
+        var ctx = new AC();
+        if (ctx.state === 'suspended') { ctx.resume(); }
+
+        var comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -8;
+        comp.knee.value = 6;
+        comp.ratio.value = 10;
+        comp.attack.value = 0.003;
+        comp.release.value = 0.25;
+
+        var master = ctx.createGain();
+        master.gain.value = 3.0;
+        master.connect(comp);
+        comp.connect(ctx.destination);
+
+        var now = ctx.currentTime;
+
+        for (var i = 0; i < 4; i++) {
+          var t = now + i * 0.08;
+          var osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(130, t);
+          osc.frequency.exponentialRampToValueAtTime(35, t + 0.3);
+          var g = ctx.createGain();
+          g.gain.setValueAtTime(0.9, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+          osc.connect(g); g.connect(master);
+          osc.start(t); osc.stop(t + 0.4);
+        }
+
+        for (var i = 0; i < 20; i++) {
+          var t = now + 0.15 + Math.random() * 2.3;
+          var dur = 0.03 + Math.random() * 0.04;
+          var bs = Math.floor(ctx.sampleRate * dur);
+          var buf = ctx.createBuffer(1, bs, ctx.sampleRate);
+          var d = buf.getChannelData(0);
+          for (var j = 0; j < bs; j++) { d[j] = Math.random() * 2 - 1; }
+          var n = ctx.createBufferSource(); n.buffer = buf;
+          var f = ctx.createBiquadFilter();
+          f.type = 'bandpass';
+          f.frequency.value = 2000 + Math.random() * 4000;
+          f.Q.value = 1.5;
+          var ng = ctx.createGain();
+          ng.gain.setValueAtTime(0.4 + Math.random() * 0.3, t);
+          ng.gain.exponentialRampToValueAtTime(0.001, t + dur);
+          n.connect(f); f.connect(ng); ng.connect(master);
+          n.start(t); n.stop(t + dur);
+        }
+
+        for (var i = 0; i < 12; i++) {
+          var t = now + 0.2 + Math.random() * 2.2;
+          var pop = ctx.createOscillator();
+          pop.type = 'sine';
+          var freq = 600 + Math.random() * 1200;
+          pop.frequency.setValueAtTime(freq, t);
+          pop.frequency.exponentialRampToValueAtTime(freq * 0.3, t + 0.1);
+          var pg = ctx.createGain();
+          pg.gain.setValueAtTime(0.5, t);
+          pg.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          pop.connect(pg); pg.connect(master);
+          pop.start(t); pop.stop(t + 0.12);
+        }
+
+        for (var i = 0; i < 3; i++) {
+          var t = now + 0.5 + i * 0.4;
+          var wh = ctx.createOscillator();
+          wh.type = 'sine';
+          wh.frequency.setValueAtTime(2500, t);
+          wh.frequency.exponentialRampToValueAtTime(500, t + 0.5);
+          var wg = ctx.createGain();
+          wg.gain.setValueAtTime(0.15, t);
+          wg.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+          wh.connect(wg); wg.connect(master);
+          wh.start(t); wh.stop(t + 0.5);
+        }
+
+        setTimeout(function(){ try { ctx.close(); } catch(e){} }, 3500);
+      } catch(e) {
+        console.warn('Parent sound error:', e);
+      }
+    }
     var MAX_LOAD_TIME = 12000; // Safety: jika iframe gagal load, hide setelah 12s
 
     function loadApp() {
