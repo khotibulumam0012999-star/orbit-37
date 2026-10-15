@@ -658,6 +658,13 @@
     function hideLoading() {
       if (loading.classList.contains('hidden')) return;
       loading.classList.add('hidden');
+
+      // Sinyal ke iframe: mulai animasi intro sekarang!
+      try {
+        appFrame.contentWindow.postMessage({ action: 'startIntro' }, '*');
+      } catch (e) {
+        console.warn('Gagal mengirim sinyal ke iframe:', e);
+      }
     }
 
     // Sembunyikan loading saat iframe selesai dimuat
