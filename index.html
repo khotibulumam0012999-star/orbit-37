@@ -96,11 +96,14 @@
     var loadTxt = document.getElementById('loadTxt');
     var progBar = document.getElementById('progBar');
     var hasEntered = false;
+    
+    // Ini adalah "Kunci Global" yang akan menyimpan izin suara dari klik tombol
+    var globalAudioCtx = null;
 
     window.addEventListener('message', function(event) {
       try {
         if (event.data && event.data.action === 'playFireworkSound') {
-          playCinematicFireworks(); // Memutar audio sinematik dari parent
+          playCinematicFireworks();
         }
       } catch(e) {}
     });
@@ -109,12 +112,13 @@
       if (hasEntered) return;
       hasEntered = true;
 
-      // Buka kunci audio browser
+      // Membuka kunci global saat tombol diklik dan MEMBIARKANNYA TERBUKA
       try {
         var AC = window.AudioContext || window.webkitAudioContext;
-        var tempCtx = new AC();
-        if (tempCtx.state === 'suspended') tempCtx.resume();
-        setTimeout(function(){ try { tempCtx.close(); } catch(e){} }, 500);
+        globalAudioCtx = new AC();
+        if (globalAudioCtx.state === 'suspended') {
+          globalAudioCtx.resume();
+        }
       } catch(e) {}
 
       enterBtn.style.display = 'none';
@@ -141,15 +145,20 @@
     enterBtn.addEventListener('click', handleEnter);
 
     // ============================================================
-    // AUDIO SINEMATIK 10 DETIK (Cinematic Fireworks)
+    // AUDIO SINEMATIK 10 DETIK
     // ============================================================
     function playCinematicFireworks() {
       try {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return;
-        var ctx = new AC();
-        if (ctx.state === 'suspended') ctx.resume();
-
+        // Gunakan kunci global yang sudah dibuka saat tombol "Masuk Portal" diklik
+        if (!globalAudioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          globalAudioCtx = new AC();
+        }
+        if (globalAudioCtx.state === 'suspended') {
+          globalAudioCtx.resume();
+        }
+        
+        var ctx = globalAudioCtx;
         var comp = ctx.createDynamicsCompressor();
         comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 10; comp.attack.value = 0.003; comp.release.value = 0.25;
         
@@ -160,7 +169,7 @@
 
         var now = ctx.currentTime;
 
-        // 1. GEMURUH AWAL (Bass Drop) - 2 detik
+        // 1. GEMURUH AWAL (Bass Drop)
         var bass = ctx.createOscillator();
         bass.type = 'sine'; bass.frequency.setValueAtTime(120, now);
         bass.frequency.exponentialRampToValueAtTime(35, now + 2.5);
@@ -168,7 +177,7 @@
         bg.gain.exponentialRampToValueAtTime(0.001, now + 3);
         bass.connect(bg); bg.connect(master); bass.start(now); bass.stop(now + 3);
 
-        // 2. LEDAKAN UTAMA (Booms) - tersebar 10 detik
+        // 2. LEDAKAN UTAMA (Booms) - 8x sepanjang 10 detik
         for (var i = 0; i < 8; i++) {
           var t = now + i * 0.8 + Math.random() * 0.2;
           var osc = ctx.createOscillator();
@@ -218,9 +227,9 @@
           pop.connect(pg); pg.connect(master); pop.start(t); pop.stop(t + 0.12);
         }
 
-        // Tutup context setelah 11 detik
-        setTimeout(function(){ try { ctx.close(); } catch(e){} }, 11000);
-      } catch(e) { console.warn('Audio error:', e); }
+      } catch(e) { 
+        console.warn('Audio error:', e); 
+      }
     }
   </script>
 </body>
