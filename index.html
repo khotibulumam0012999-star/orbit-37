@@ -7,664 +7,152 @@
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M32 6 L54 26 L32 58 L10 26 Z' fill='%23153D32' stroke='%23E7D39B' stroke-width='3'/><circle cx='32' cy='26' r='3' fill='%23E7D39B'/></svg>" type="image/svg+xml" />
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      width: 100%;
-      height: 100%;
-      background: #091B20;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-      overflow: hidden;
-    }
-
-    .container {
-      width: 100%;
-      height: 100vh;
-      height: -webkit-fill-available;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .iframe-container {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #091B20;
-    }
-
-    /* ========================================
-       LOADING SCREEN
-       DUNIA KREASI DIGITAL
-       Palet: teal gelap + emas + cyan
-       ======================================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background: #091B20; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; overflow: hidden; }
+    .container { width: 100%; height: 100vh; height: -webkit-fill-available; display: flex; flex-direction: column; }
+    .iframe-container { flex: 1; width: 100%; height: 100%; position: relative; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; background: #091B20; }
 
     .loading {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      background:
-        radial-gradient(circle at 8% 20%, rgba(21, 61, 50, 0.45), transparent 30%),
-        radial-gradient(circle at 92% 72%, rgba(23, 72, 62, 0.40), transparent 28%),
-        radial-gradient(circle at 55% 0%, rgba(21, 47, 73, 0.35), transparent 34%),
-        linear-gradient(135deg, #091B20 0%, #0C262B 48%, #102E33 100%);
-
-      z-index: 10;
-
-      transition: opacity 0.6s ease, visibility 0.6s ease;
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 8% 20%, rgba(21, 61, 50, 0.45), transparent 30%),
+                  radial-gradient(circle at 92% 72%, rgba(23, 72, 62, 0.40), transparent 28%),
+                  radial-gradient(circle at 55% 0%, rgba(21, 47, 73, 0.35), transparent 34%),
+                  linear-gradient(135deg, #091B20 0%, #0C262B 48%, #102E33 100%);
+      z-index: 10; transition: opacity 0.6s ease, visibility 0.6s ease;
     }
-
-    .loading.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    /* ========================================
-       BACKGROUND GLOW
-       ======================================== */
-
-    .background-glow {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-      filter: blur(5px);
-    }
-
-    .glow-left {
-      width: 280px;
-      height: 280px;
-      left: -140px;
-      top: 5%;
-      background: rgba(21, 61, 50, 0.30);
-    }
-
-    .glow-right {
-      width: 340px;
-      height: 340px;
-      right: -160px;
-      bottom: -110px;
-      background: rgba(231, 211, 155, 0.15);
-    }
-
-    .glow-top {
-      width: 200px;
-      height: 200px;
-      right: 20%;
-      top: -100px;
-      background: rgba(168, 229, 242, 0.12);
-    }
-
-    /* ========================================
-       FLOATING ICONS (Tema Karya & Game)
-       ======================================== */
-
-    .floating-icon {
-      position: absolute;
-      width: 44px;
-      height: 44px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 14px;
-
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(231, 211, 155, 0.18);
-
-      box-shadow:
-        0 12px 30px rgba(0, 0, 0, 0.22),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-
-      font-size: 20px;
-
-      animation: floating 4s ease-in-out infinite;
-      opacity: 0.85;
-    }
-
-    .floating-one {
-      top: 15%;
-      left: 17%;
-      animation-delay: 0s;
-    }
-
-    .floating-two {
-      top: 19%;
-      right: 18%;
-      animation-delay: 1s;
-    }
-
-    .floating-three {
-      bottom: 17%;
-      left: 19%;
-      animation-delay: 1.8s;
-    }
-
-    .floating-four {
-      bottom: 14%;
-      right: 18%;
-      animation-delay: 2.6s;
-    }
-
-    @keyframes floating {
-      0%, 100% {
-        transform: translateY(0) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-10px) rotate(3deg);
-      }
-    }
-
-    /* ========================================
-       MAIN CARD (Glassmorphism)
-       ======================================== */
-
-    .loading-content {
-      position: relative;
-      z-index: 5;
-
-      width: min(90%, 460px);
-
-      padding: 38px 30px 34px;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      text-align: center;
-
-      background: rgba(15, 42, 35, 0.55);
-
-      border: 1px solid rgba(231, 211, 155, 0.18);
-
-      border-radius: 32px;
-
-      box-shadow:
-        0 30px 80px rgba(0, 0, 0, 0.32),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-
-      animation: cardAppear 0.8s ease-out;
-    }
-
-    @keyframes cardAppear {
-      from {
-        opacity: 0;
-        transform: translateY(18px) scale(0.97);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    /* ========================================
-       CREATIVE ORBIT
-       ======================================== */
-
-    .creative-loader {
-      position: relative;
-      width: 170px;
-      height: 170px;
-      margin-bottom: 23px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .orbit {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      border: 1.5px solid rgba(231, 211, 155, 0.30);
-      border-radius: 50%;
-      animation: rotateOrbit 8s linear infinite;
-    }
-
-    .orbit::after {
-      content: "";
-      position: absolute;
-      width: 9px;
-      height: 9px;
-      top: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-radius: 50%;
-      background: #E7D39B;
-      box-shadow:
-        0 0 0 5px rgba(231, 211, 155, 0.12),
-        0 0 18px rgba(231, 211, 155, 0.55);
-    }
-
-    .orbit-inner {
-      position: absolute;
-      width: 112px;
-      height: 112px;
-      border: 1.5px solid rgba(168, 229, 242, 0.32);
-      border-radius: 50%;
-      animation: rotateOrbitReverse 6s linear infinite;
-    }
-
-    .orbit-inner::after {
-      content: "";
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      right: -4px;
-      top: 50%;
-      transform: translateY(-50%);
-      border-radius: 50%;
-      background: #A8E5F2;
-      box-shadow:
-        0 0 0 5px rgba(168, 229, 242, 0.12),
-        0 0 18px rgba(168, 229, 242, 0.45);
-    }
-
-    @keyframes rotateOrbit {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-    @keyframes rotateOrbitReverse {
-      from { transform: rotate(360deg); }
-      to   { transform: rotate(0deg); }
-    }
-
-    /* ========================================
-       CENTRAL CRYSTAL EMBLEM
-       (Mengganti globe — sesuai tema portal)
-       ======================================== */
-
-    .crystal {
-      position: relative;
-      width: 70px;
-      height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #17483E, #0F2A23 48%, #0A1F19);
-      border: 1px solid rgba(231, 211, 155, 0.28);
-      box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.32),
-        inset 5px 5px 12px rgba(255, 255, 255, 0.08),
-        inset -5px -5px 12px rgba(0, 0, 0, 0.22);
-      animation: crystalPulse 3s ease-in-out infinite;
-    }
-
-    .crystal svg {
-      width: 38px;
-      height: 38px;
-      position: relative;
-      z-index: 2;
-    }
-
-    @keyframes crystalPulse {
-      0%, 100% { transform: scale(1); }
-      50%      { transform: scale(1.06); }
-    }
-
-    /* ========================================
-       ORBIT ICONS (Tema Karya & Game)
-       ======================================== */
-
-    .creative-icon {
-      position: absolute;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(231, 211, 155, 0.18);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-      font-size: 17px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      animation: iconFloat 3s ease-in-out infinite;
-    }
-
-    .icon-art {
-      top: 0;
-      left: 12px;
-      animation-delay: 0.3s;
-    }
-
-    .icon-game {
-      top: 14px;
-      right: 2px;
-      animation-delay: 0.8s;
-    }
-
-    .icon-spark {
-      bottom: 6px;
-      right: 15px;
-      animation-delay: 1.3s;
-    }
-
-    .icon-puzzle {
-      bottom: 5px;
-      left: 13px;
-      animation-delay: 1.8s;
-    }
-
-    .icon-star {
-      top: 50%;
-      left: -2px;
-      animation-delay: 2.2s;
-    }
-
-    @keyframes iconFloat {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-5px); }
-    }
-
-    /* ========================================
-       BRAND
-       ======================================== */
-
-    .brand {
-      font-size: 1.55rem;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: #F5FBF8;
-      margin-bottom: 5px;
-    }
-
-    .brand-subtitle {
-      color: #8FB5AA;
-      font-size: 0.84rem;
-      font-weight: 500;
-      letter-spacing: 0.7px;
-      margin-bottom: 25px;
-    }
-
-    /* ========================================
-       LOADING TEXT
-       ======================================== */
-
-    .loading-text {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #D5DEE2;
-      letter-spacing: 0.2px;
-    }
-
-    .loading-text::after {
-      content: '';
-      animation: dots 2s infinite;
-    }
-
-    @keyframes dots {
-      0%, 20%   { content: ''; }
-      40%       { content: '.'; }
-      60%       { content: '..'; }
-      80%, 100% { content: '...'; }
-    }
-
-    /* ========================================
-       PROGRESS BAR
-       ======================================== */
-
-    .progress-container {
-      width: 190px;
-      height: 4px;
-      margin-top: 15px;
-      overflow: hidden;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.10);
-    }
-
-    .progress-bar {
-      width: 45%;
-      height: 100%;
-      border-radius: 20px;
-      background: linear-gradient(90deg, #17483E, #E7D39B, #A8E5F2);
-      animation: loadingProgress 1.6s ease-in-out infinite;
-    }
-
-    @keyframes loadingProgress {
-      0%   { transform: translateX(-120%); }
-      50%  { transform: translateX(100%); }
-      100% { transform: translateX(320%); }
-    }
-
-    /* ========================================
-       MOBILE
-       ======================================== */
-
-    @media (max-width: 480px) {
-      .loading-content {
-        width: 88%;
-        padding: 32px 22px 28px;
-        border-radius: 27px;
-      }
-
-      .creative-loader {
-        transform: scale(0.92);
-        margin-bottom: 18px;
-      }
-
-      .brand {
-        font-size: 1.35rem;
-      }
-
-      .brand-subtitle {
-        font-size: 0.75rem;
-        margin-bottom: 22px;
-      }
-
-      .loading-text {
-        font-size: 0.85rem;
-      }
-
-      .floating-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 17px;
-      }
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .orbit, .orbit-inner, .crystal, .creative-icon,
-      .floating-icon, .progress-bar {
-        animation: none !important;
-      }
-    }
+    .loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    
+    .bg-glow { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(5px); }
+    .glow-l { width: 280px; height: 280px; left: -140px; top: 5%; background: rgba(21, 61, 50, 0.30); }
+    .glow-r { width: 340px; height: 340px; right: -160px; bottom: -110px; background: rgba(231, 211, 155, 0.15); }
+    
+    .float-icon { position: absolute; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(231, 211, 155, 0.18); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); font-size: 20px; animation: floating 4s ease-in-out infinite; opacity: 0.85; }
+    .f1 { top: 15%; left: 17%; } .f2 { top: 19%; right: 18%; animation-delay: 1s; } .f3 { bottom: 17%; left: 19%; animation-delay: 1.8s; } .f4 { bottom: 14%; right: 18%; animation-delay: 2.6s; }
+    @keyframes floating { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+
+    .content { position: relative; z-index: 5; width: min(90%, 460px); padding: 38px 30px 34px; display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(15, 42, 35, 0.55); border: 1px solid rgba(231, 211, 155, 0.18); border-radius: 32px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08); backdrop-filter: blur(22px); animation: cardAppear 0.8s ease-out; }
+    @keyframes cardAppear { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    
+    .loader { position: relative; width: 170px; height: 170px; margin-bottom: 23px; display: flex; align-items: center; justify-content: center; }
+    .orbit { position: absolute; width: 150px; height: 150px; border: 1.5px solid rgba(231, 211, 155, 0.30); border-radius: 50%; animation: rot 8s linear infinite; }
+    .orbit::after { content: ""; position: absolute; width: 9px; height: 9px; top: -5px; left: 50%; transform: translateX(-50%); border-radius: 50%; background: #E7D39B; box-shadow: 0 0 0 5px rgba(231, 211, 155, 0.12), 0 0 18px rgba(231, 211, 155, 0.55); }
+    .orbit-in { position: absolute; width: 112px; height: 112px; border: 1.5px solid rgba(168, 229, 242, 0.32); border-radius: 50%; animation: rotR 6s linear infinite; }
+    .orbit-in::after { content: ""; position: absolute; width: 8px; height: 8px; right: -4px; top: 50%; transform: translateY(-50%); border-radius: 50%; background: #A8E5F2; box-shadow: 0 0 0 5px rgba(168, 229, 242, 0.12), 0 0 18px rgba(168, 229, 242, 0.45); }
+    @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } @keyframes rotR { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+    
+    .crystal { position: relative; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(145deg, #17483E, #0F2A23 48%, #0A1F19); border: 1px solid rgba(231, 211, 155, 0.28); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.32), inset 5px 5px 12px rgba(255, 255, 255, 0.08), inset -5px -5px 12px rgba(0, 0, 0, 0.22); animation: pulse 3s ease-in-out infinite; }
+    .crystal svg { width: 38px; height: 38px; position: relative; z-index: 2; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+    .brand { font-size: 1.55rem; font-weight: 800; letter-spacing: 0.5px; color: #F5FBF8; margin-bottom: 5px; }
+    .sub { color: #8FB5AA; font-size: 0.84rem; font-weight: 500; letter-spacing: 0.7px; margin-bottom: 25px; }
+    
+    .btn { margin-top: 10px; padding: 14px 38px; background: linear-gradient(90deg, #17483E, #E7D39B); border: none; border-radius: 30px; color: #091B20; font-weight: 800; font-size: 1rem; letter-spacing: 0.5px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 20px rgba(231, 211, 155, 0.3); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(231, 211, 155, 0.45); }
+    
+    .load-txt { font-size: 0.92rem; font-weight: 600; color: #D5DEE2; margin-top: 20px; display: none; }
+    .prog { width: 190px; height: 4px; margin-top: 15px; overflow: hidden; border-radius: 20px; background: rgba(255, 255, 255, 0.10); display: none; }
+    .prog-bar { width: 45%; height: 100%; border-radius: 20px; background: linear-gradient(90deg, #17483E, #E7D39B, #A8E5F2); animation: load 1.6s ease-in-out infinite; }
+    @keyframes load { 0% { transform: translateX(-120%); } 50% { transform: translateX(100%); } 100% { transform: translateX(320%); } }
   </style>
 </head>
 
 <body>
-
   <div class="container">
-
-    <!-- ========================================
-         LOADING SCREEN
-         ======================================== -->
-
     <div class="loading" id="loading">
-
-      <!-- Background Glow -->
-      <div class="background-glow glow-left"></div>
-      <div class="background-glow glow-right"></div>
-      <div class="background-glow glow-top"></div>
-
-      <!-- Floating Creative Icons -->
-      <div class="floating-icon floating-one">🎨</div>
-      <div class="floating-icon floating-two">🎮</div>
-      <div class="floating-icon floating-three">✨</div>
-      <div class="floating-icon floating-four">🧩</div>
-
-      <!-- Main Card -->
-      <div class="loading-content">
-
-        <!-- Creative Orbit -->
-        <div class="creative-loader">
-
-          <div class="orbit"></div>
-          <div class="orbit-inner"></div>
-
-          <div class="creative-icon icon-art">🎨</div>
-          <div class="creative-icon icon-game">🎮</div>
-          <div class="creative-icon icon-spark">✨</div>
-          <div class="creative-icon icon-puzzle">🧩</div>
-          <div class="creative-icon icon-star">⭐</div>
-
-          <!-- Central Crystal Emblem -->
+      <div class="bg-glow glow-l"></div><div class="bg-glow glow-r"></div>
+      <div class="float-icon f1">🎨</div><div class="float-icon f2">🎮</div><div class="float-icon f3">✨</div><div class="float-icon f4">🧩</div>
+      
+      <div class="content">
+        <div class="loader">
+          <div class="orbit"></div><div class="orbit-in"></div>
           <div class="crystal">
             <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-              <path d="M32 6 L54 26 L32 58 L10 26 Z"
-                    fill="rgba(231,211,155,0.15)"
-                    stroke="#E7D39B" stroke-width="2"
-                    stroke-linejoin="round"/>
-              <path d="M32 6 L54 26 L32 26 L10 26 Z"
-                    fill="rgba(168,229,242,0.10)"
-                    stroke="#A8E5F2" stroke-width="1.5"
-                    stroke-linejoin="round"/>
+              <path d="M32 6 L54 26 L32 58 L10 26 Z" fill="rgba(231,211,155,0.15)" stroke="#E7D39B" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M32 6 L54 26 L32 26 L10 26 Z" fill="rgba(168,229,242,0.10)" stroke="#A8E5F2" stroke-width="1.5" stroke-linejoin="round"/>
               <circle cx="32" cy="26" r="3.2" fill="#E7D39B"/>
             </svg>
           </div>
-
         </div>
-
-        <!-- Brand -->
         <div class="brand">ORBIT 37</div>
-        <div class="brand-subtitle">Karya Murid &amp; Game Interaktif</div>
-
-        <!-- Loading -->
-        <div class="loading-text">Memuat Portal Kreasi</div>
-        <div class="progress-container">
-          <div class="progress-bar"></div>
-        </div>
-
+        <div class="sub">Karya Murid &amp; Game Interaktif</div>
+        <button class="btn" id="enterBtn">Masuk Portal</button>
+        <div class="load-txt" id="loadTxt">Memuat Portal Kreasi</div>
+        <div class="prog" id="progBar"><div class="prog-bar"></div></div>
       </div>
-
     </div>
-
-    <!-- ========================================
-         IFRAME APLIKASI
-         ======================================== -->
 
     <div class="iframe-container">
-      <iframe
-        id="appFrame"
-        src=""
-        allow="fullscreen"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads">
-      </iframe>
+      <iframe id="appFrame" src="" allow="fullscreen; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-autoplay"></iframe>
     </div>
-
   </div>
 
   <script>
-    // =============================================
-    // URL GOOGLE APPS SCRIPT WEB APP
-    // Ganti dengan URL deployment Anda.
-    // URL ini didapat dari menu "Terapkan > Kelola deployment"
-    // di editor Apps Script.
-    // =============================================
     var APP_URL = "https://script.google.com/macros/s/AKfycbxv1yCZODIO2b2Pt8HzEwKmHUkk2S9hFelM7QP718pP8Folab0qJ-2qS2UgnDBYcsE8OQ/exec";
-
     var appFrame = document.getElementById('appFrame');
     var loading = document.getElementById('loading');
+    var enterBtn = document.getElementById('enterBtn');
+    var loadTxt = document.getElementById('loadTxt');
+    var progBar = document.getElementById('progBar');
+    var hasEntered = false;
 
-    // =============================================
-    // HANDLER REQUEST DARI IFRAME (postMessage)
-    // Meneruskan permintaan yang iframe tidak bisa lakukan
-    // sendiri karena pembatasan cross-origin.
-    // =============================================
     window.addEventListener('message', function(event) {
       try {
-        var data = event.data;
-        if (!data || typeof data !== 'object') return;
-
-        // 1. Buka tab kosong
-        if (data.action === 'openBlank') {
-          window.open('', '_blank');
-          return;
+        if (event.data && event.data.action === 'playFireworkSound') {
+          playCinematicFireworks(); // Memutar audio sinematik dari parent
         }
-
-        // 2. Buka URL langsung (mis. download atau tautan eksternal)
-        if (data.action === 'openDownload' && data.url) {
-          window.open(data.url, '_blank');
-          return;
-        }
-
-        // 3. Fullscreen
-        if (data.action === 'requestFullscreen') {
-          var el = document.documentElement;
-          var fn =
-            el.requestFullscreen ||
-            el.webkitRequestFullscreen ||
-            el.msRequestFullscreen;
-          if (fn) {
-            try { fn.call(el); } catch(e) {}
-          }
-          return;
-        }
-          // 4. Suara petasan dari iframe
-        if (data.action === 'playFireworkSound') {
-          playFireworkSound();
-          return;
-        }
-      } catch(e) {
-        console.warn('PostMessage error:', e);
-      }
+      } catch(e) {}
     });
 
-    // =============================================
-    // LOGIKA DELAY MINIMUM
-    // Loading screen tampil minimal MIN_LOAD_TIME,
-    // terlepas dari kecepatan iframe load.
-    // =============================================
-    var startTime = Date.now();
-    var MIN_LOAD_TIME = 4000;  // 4 detik (lebih cepat dari 6s agar intro animasi portal masih terlihat)
-        // =============================================
-    // FUNGSI SUARA PETASAN (parent context)
-    // Dipanggil via postMessage dari iframe
-    // Parent punya user gesture → audio pasti bunyi
-    // =============================================
-    function playFireworkSound() {
+    function handleEnter() {
+      if (hasEntered) return;
+      hasEntered = true;
+
+      // Buka kunci audio browser
+      try {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        var tempCtx = new AC();
+        if (tempCtx.state === 'suspended') tempCtx.resume();
+        setTimeout(function(){ try { tempCtx.close(); } catch(e){} }, 500);
+      } catch(e) {}
+
+      enterBtn.style.display = 'none';
+      loadTxt.style.display = 'block';
+      progBar.style.display = 'block';
+
+      var targetUrl = APP_URL;
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('id');
+      if (id) targetUrl += (targetUrl.indexOf('?') !== -1 ? '&' : '?') + 'id=' + encodeURIComponent(id);
+      
+      appFrame.src = targetUrl;
+    }
+
+    function hideLoading() {
+      if (loading.classList.contains('hidden')) return;
+      loading.classList.add('hidden');
+      try { appFrame.contentWindow.postMessage({ action: 'startIntro' }, '*'); } catch (e) {}
+    }
+
+    appFrame.addEventListener('load', hideLoading);
+    setTimeout(function() { if (!loading.classList.contains('hidden')) hideLoading(); }, 10000);
+
+    enterBtn.addEventListener('click', handleEnter);
+
+    // ============================================================
+    // AUDIO SINEMATIK 10 DETIK (Cinematic Fireworks)
+    // ============================================================
+    function playCinematicFireworks() {
       try {
         var AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
-
         var ctx = new AC();
-        if (ctx.state === 'suspended') { ctx.resume(); }
+        if (ctx.state === 'suspended') ctx.resume();
 
         var comp = ctx.createDynamicsCompressor();
-        comp.threshold.value = -8;
-        comp.knee.value = 6;
-        comp.ratio.value = 10;
-        comp.attack.value = 0.003;
-        comp.release.value = 0.25;
-
+        comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 10; comp.attack.value = 0.003; comp.release.value = 0.25;
+        
         var master = ctx.createGain();
         master.gain.value = 3.0;
         master.connect(comp);
@@ -672,116 +160,68 @@
 
         var now = ctx.currentTime;
 
-        for (var i = 0; i < 4; i++) {
-          var t = now + i * 0.08;
+        // 1. GEMURUH AWAL (Bass Drop) - 2 detik
+        var bass = ctx.createOscillator();
+        bass.type = 'sine'; bass.frequency.setValueAtTime(120, now);
+        bass.frequency.exponentialRampToValueAtTime(35, now + 2.5);
+        var bg = ctx.createGain(); bg.gain.setValueAtTime(0.8, now);
+        bg.gain.exponentialRampToValueAtTime(0.001, now + 3);
+        bass.connect(bg); bg.connect(master); bass.start(now); bass.stop(now + 3);
+
+        // 2. LEDAKAN UTAMA (Booms) - tersebar 10 detik
+        for (var i = 0; i < 8; i++) {
+          var t = now + i * 0.8 + Math.random() * 0.2;
           var osc = ctx.createOscillator();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(130, t);
-          osc.frequency.exponentialRampToValueAtTime(35, t + 0.3);
-          var g = ctx.createGain();
-          g.gain.setValueAtTime(0.9, t);
-          g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
-          osc.connect(g); g.connect(master);
-          osc.start(t); osc.stop(t + 0.4);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(150, t);
+          osc.frequency.exponentialRampToValueAtTime(40, t + 0.4);
+          var g = ctx.createGain(); g.gain.setValueAtTime(0.9, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+          osc.connect(g); g.connect(master); osc.start(t); osc.stop(t + 0.5);
         }
 
-        for (var i = 0; i < 20; i++) {
-          var t = now + 0.15 + Math.random() * 2.3;
-          var dur = 0.03 + Math.random() * 0.04;
+        // 3. DENTINGAN BINTANG (Sparkles) - 40 partikel
+        for (var i = 0; i < 40; i++) {
+          var t = now + 0.2 + Math.random() * 9.5;
+          var dur = 0.05 + Math.random() * 0.05;
           var bs = Math.floor(ctx.sampleRate * dur);
           var buf = ctx.createBuffer(1, bs, ctx.sampleRate);
           var d = buf.getChannelData(0);
-          for (var j = 0; j < bs; j++) { d[j] = Math.random() * 2 - 1; }
+          for (var j = 0; j < bs; j++) d[j] = Math.random() * 2 - 1;
           var n = ctx.createBufferSource(); n.buffer = buf;
-          var f = ctx.createBiquadFilter();
-          f.type = 'bandpass';
-          f.frequency.value = 2000 + Math.random() * 4000;
-          f.Q.value = 1.5;
-          var ng = ctx.createGain();
-          ng.gain.setValueAtTime(0.4 + Math.random() * 0.3, t);
+          var f = ctx.createBiquadFilter(); f.type = 'bandpass';
+          f.frequency.value = 3000 + Math.random() * 4000; f.Q.value = 2;
+          var ng = ctx.createGain(); ng.gain.setValueAtTime(0.5, t);
           ng.gain.exponentialRampToValueAtTime(0.001, t + dur);
-          n.connect(f); f.connect(ng); ng.connect(master);
-          n.start(t); n.stop(t + dur);
+          n.connect(f); f.connect(ng); ng.connect(master); n.start(t); n.stop(t + dur);
         }
 
-        for (var i = 0; i < 12; i++) {
-          var t = now + 0.2 + Math.random() * 2.2;
-          var pop = ctx.createOscillator();
-          pop.type = 'sine';
-          var freq = 600 + Math.random() * 1200;
-          pop.frequency.setValueAtTime(freq, t);
-          pop.frequency.exponentialRampToValueAtTime(freq * 0.3, t + 0.1);
-          var pg = ctx.createGain();
-          pg.gain.setValueAtTime(0.5, t);
-          pg.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-          pop.connect(pg); pg.connect(master);
-          pop.start(t); pop.stop(t + 0.12);
-        }
-
-        for (var i = 0; i < 3; i++) {
-          var t = now + 0.5 + i * 0.4;
-          var wh = ctx.createOscillator();
-          wh.type = 'sine';
+        // 4. PELUIT JATUH (Whistles) - 5x
+        for (var i = 0; i < 5; i++) {
+          var t = now + 1 + i * 1.8;
+          var wh = ctx.createOscillator(); wh.type = 'sine';
           wh.frequency.setValueAtTime(2500, t);
-          wh.frequency.exponentialRampToValueAtTime(500, t + 0.5);
-          var wg = ctx.createGain();
-          wg.gain.setValueAtTime(0.15, t);
-          wg.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-          wh.connect(wg); wg.connect(master);
-          wh.start(t); wh.stop(t + 0.5);
+          wh.frequency.exponentialRampToValueAtTime(400, t + 0.6);
+          var wg = ctx.createGain(); wg.gain.setValueAtTime(0.2, t);
+          wg.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+          wh.connect(wg); wg.connect(master); wh.start(t); wh.stop(t + 0.6);
         }
 
-        setTimeout(function(){ try { ctx.close(); } catch(e){} }, 3500);
-      } catch(e) {
-        console.warn('Parent sound error:', e);
-      }
+        // 5. EFEK POP TINGGI (Pops) - 20x
+        for (var i = 0; i < 20; i++) {
+          var t = now + 0.5 + Math.random() * 9;
+          var pop = ctx.createOscillator(); pop.type = 'triangle';
+          var freq = 800 + Math.random() * 1500;
+          pop.frequency.setValueAtTime(freq, t);
+          pop.frequency.exponentialRampToValueAtTime(freq * 0.2, t + 0.1);
+          var pg = ctx.createGain(); pg.gain.setValueAtTime(0.4, t);
+          pg.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+          pop.connect(pg); pg.connect(master); pop.start(t); pop.stop(t + 0.12);
+        }
+
+        // Tutup context setelah 11 detik
+        setTimeout(function(){ try { ctx.close(); } catch(e){} }, 11000);
+      } catch(e) { console.warn('Audio error:', e); }
     }
-    var MAX_LOAD_TIME = 12000; // Safety: jika iframe gagal load, hide setelah 12s
-
-    function loadApp() {
-      var targetUrl = APP_URL;
-
-      // Teruskan parameter query string (mis. ?id=xxx) ke iframe
-      var params = new URLSearchParams(window.location.search);
-      var id = params.get('id');
-      if (id) {
-        targetUrl += (targetUrl.indexOf('?') !== -1 ? '&' : '?') + 'id=' + encodeURIComponent(id);
-      }
-
-      appFrame.src = targetUrl;
-    }
-
-    function hideLoading() {
-      if (loading.classList.contains('hidden')) return;
-      loading.classList.add('hidden');
-
-      // Sinyal ke iframe: mulai animasi intro sekarang!
-      try {
-        appFrame.contentWindow.postMessage({ action: 'startIntro' }, '*');
-      } catch (e) {
-        console.warn('Gagal mengirim sinyal ke iframe:', e);
-      }
-    }
-
-    // Sembunyikan loading saat iframe selesai dimuat
-    appFrame.addEventListener('load', function() {
-      var elapsedTime = Date.now() - startTime;
-      var remainingTime = MIN_LOAD_TIME - elapsedTime;
-
-      if (remainingTime > 0) {
-        setTimeout(hideLoading, remainingTime);
-      } else {
-        hideLoading();
-      }
-    });
-
-    // Safety: jika iframe tidak pernah fire load (mis. diblokir X-Frame-Options),
-    // tetap sembunyikan loading setelah MAX_LOAD_TIME.
-    setTimeout(hideLoading, MAX_LOAD_TIME);
-
-    // Mulai muat iframe
-    window.addEventListener('DOMContentLoaded', loadApp);
   </script>
-
 </body>
 </html>
