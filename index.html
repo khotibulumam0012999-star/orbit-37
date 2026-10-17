@@ -84,12 +84,12 @@
     </div>
 
     <div class="iframe-container">
-      <iframe id="appFrame" src="" allow="fullscreen; autoplay" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads allow-autoplay"></iframe>
+      <iframe id="appFrame" src="" allow="fullscreen; autoplay; accelerometer; gyroscope; picture-in-picture; encrypted-media" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
   </div>
 
   <script>
-    var APP_URL = "https://script.google.com/macros/s/AKfycbw4jNkwe7Md7AicIzKkWy-Xwur1WtkRt8lrH1J6UafEjRFZKLukrs1jgNo6-9FMHWQo/exec";
+    var APP_URL = "https://script.google.com/macros/s/AKfycbw4jNkwe7Md7AicIzKkWy-Xwur1WtkRt8lrH1J6UafEjRFZKLukrs1jgNo6-9FMHWQo/exec?v=" + Date.now();
     var appFrame = document.getElementById('appFrame');
     var loading = document.getElementById('loading');
     var enterBtn = document.getElementById('enterBtn');
