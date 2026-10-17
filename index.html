@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>ORBIT 37</title>
   <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M32 6 L54 26 L32 58 L10 26 Z' fill='%23153D32' stroke='%23E7D39B' stroke-width='3'/><circle cx='32' cy='26' r='3' fill='%23E7D39B'/></svg>" type="image/svg+xml" />
 
@@ -84,12 +87,20 @@
     </div>
 
     <div class="iframe-container">
-      <iframe id="appFrame" src="" allow="fullscreen; autoplay; accelerometer; gyroscope; picture-in-picture; encrypted-media" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <iframe 
+        id="appFrame" 
+        src="" 
+        allow="fullscreen; autoplay; accelerometer; gyroscope; picture-in-picture; encrypted-media; clipboard-write" 
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        loading="eager"
+      ></iframe>
     </div>
   </div>
 
   <script>
-    var APP_URL = "https://script.google.com/macros/s/AKfycbw4jNkwe7Md7AicIzKkWy-Xwur1WtkRt8lrH1J6UafEjRFZKLukrs1jgNo6-9FMHWQo/exec?v=" + Date.now();
+    // Cache-buster: timestamp unik setiap load → iframe SELALU ambil versi baru
+    var APP_URL = "https://script.google.com/macros/s/AKfycbw4jNkwe7Md7AicIzKkWy-Xwur1WtkRt8lrH1J6UafEjRFZKLukrs1jgNo6-9FMHWQo/exec?cb=" + Date.now();
     var appFrame = document.getElementById('appFrame');
     var loading = document.getElementById('loading');
     var enterBtn = document.getElementById('enterBtn');
@@ -125,10 +136,11 @@
       loadTxt.style.display = 'block';
       progBar.style.display = 'block';
 
+      // APP_URL sudah punya ?cb=timestamp, jadi tinggal tambah id jika ada
       var targetUrl = APP_URL;
       var params = new URLSearchParams(window.location.search);
       var id = params.get('id');
-      if (id) targetUrl += (targetUrl.indexOf('?') !== -1 ? '&' : '?') + 'id=' + encodeURIComponent(id);
+      if (id) targetUrl += '&id=' + encodeURIComponent(id);
       
       appFrame.src = targetUrl;
     }
